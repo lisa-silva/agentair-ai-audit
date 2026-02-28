@@ -47,7 +47,7 @@ def generate_pdf(business_name, url, score, recommendations, filename="audit_rep
     
     for rec in recommendations:
         clean_rec = clean_text(rec)
-        pdf.multi_cell(0, 8, f"• {clean_rec}")
+        pdf.multi_cell(0, 8, f"- {clean_rec}")
     
     # Save to a temporary path that Streamlit can read
     temp_filename = f"/tmp/{clean_text(filename)}"
