@@ -5,3 +5,4 @@ openai
 fpdf
 python-dotenv
 validators
+python-dejavu-fonts
