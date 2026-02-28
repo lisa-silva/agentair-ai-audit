@@ -1,46 +1,55 @@
 from fpdf import FPDF
 import datetime
+import unicodedata
 
 class PDF(FPDF):
     def header(self):
-        # Add a Unicode-compatible font (DejaVu is a good choice)
-        self.add_font('DejaVu', '', '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', uni=True) # Path for Linux/Streamlit Cloud
-        self.add_font('DejaVu', 'B', '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', uni=True)
-        self.set_font('DejaVu', 'B', 16)
+        # Use built-in fonts only (no external dependencies)
+        self.set_font("Helvetica", "B", 16)
         self.cell(0, 10, "AgentAir AI Visibility Audit", ln=True, align="C")
         self.ln(10)
 
     def footer(self):
         self.set_y(-15)
-        self.set_font('DejaVu', '', 8)
+        self.set_font("Helvetica", "I", 8)
         self.cell(0, 10, f"Page {self.page_no()}", align="C")
+
+def clean_text(text):
+    """Remove or replace characters that cause Unicode errors."""
+    if not isinstance(text, str):
+        text = str(text)
+    # Normalize unicode characters to closest ASCII equivalent
+    text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('ascii')
+    # Replace any remaining problematic characters
+    return text
 
 def generate_pdf(business_name, url, score, recommendations, filename="audit_report.pdf"):
     pdf = PDF()
     pdf.add_page()
-
-    # Use the Unicode font for all text
-    pdf.set_font('DejaVu', '', 12)
-    pdf.cell(0, 10, f"Business: {business_name}", ln=True)
-    pdf.cell(0, 10, f"Website: {url}", ln=True)
+    
+    # Clean all text inputs
+    clean_business = clean_text(business_name)
+    clean_url = clean_text(url)
+    
+    pdf.set_font("Helvetica", size=12)
+    pdf.cell(0, 10, f"Business: {clean_business}", ln=True)
+    pdf.cell(0, 10, f"Website: {clean_url}", ln=True)
     pdf.cell(0, 10, f"Audit Date: {datetime.date.today()}", ln=True)
     pdf.ln(10)
 
-    pdf.set_font('DejaVu', 'B', 14)
+    pdf.set_font("Helvetica", "B", 14)
     pdf.cell(0, 10, f"AI Visibility Score: {score}/100", ln=True)
     pdf.ln(5)
 
-    pdf.set_font('DejaVu', 'B', 12)
+    pdf.set_font("Helvetica", "B", 12)
     pdf.cell(0, 10, "Recommendations:", ln=True)
-    pdf.set_font('DejaVu', '', 11)
+    pdf.set_font("Helvetica", size=11)
+    
     for rec in recommendations:
-        # Handle any potential special characters in the recommendations
-        try:
-            pdf.multi_cell(0, 8, f"• {rec}")
-        except:
-            # If it still fails, try to encode it safely
-            safe_rec = rec.encode('ascii', 'replace').decode('ascii')
-            pdf.multi_cell(0, 8, f"• {safe_rec}")
-
-    pdf.output(filename)
-    return filename
+        clean_rec = clean_text(rec)
+        pdf.multi_cell(0, 8, f"• {clean_rec}")
+    
+    # Ensure the filename is safe
+    safe_filename = clean_text(filename)
+    pdf.output(safe_filename)
+    return safe_filename
