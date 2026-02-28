@@ -1,10 +1,10 @@
 from fpdf import FPDF
 import datetime
 import unicodedata
+import os
 
 class PDF(FPDF):
     def header(self):
-        # Use built-in fonts only (no external dependencies)
         self.set_font("Helvetica", "B", 16)
         self.cell(0, 10, "AgentAir AI Visibility Audit", ln=True, align="C")
         self.ln(10)
@@ -49,7 +49,7 @@ def generate_pdf(business_name, url, score, recommendations, filename="audit_rep
         clean_rec = clean_text(rec)
         pdf.multi_cell(0, 8, f"• {clean_rec}")
     
-    # Ensure the filename is safe
-    safe_filename = clean_text(filename)
-    pdf.output(safe_filename)
-    return safe_filename
+    # Save to a temporary path that Streamlit can read
+    temp_filename = f"/tmp/{clean_text(filename)}"
+    pdf.output(temp_filename)
+    return temp_filename
