@@ -1,51 +1,40 @@
 import streamlit as st
-from utils.scraper import fetch_website_content, extract_text
-from utils.analyzer import check_schema_markup, check_entity_coverage, calculate_visibility_score, generate_recommendations
-from utils.pdf_generator import generate_pdf
-import os
 
-st.set_page_config(page_title="AgentAir AI Audit", layout="centered")
+st.set_page_config(
+    page_title="AgentAir",
+    page_icon="🛡️",
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
 
-st.title("🔍 AgentAir AI Visibility Audit")
-st.markdown("Enter a business website to see how visible it is to AI search (Siri, Gemini, ChatGPT).")
+st.title("🛡️ AgentAir")
+st.markdown("Welcome to AgentAir — your AI visibility toolkit.")
 
-with st.form("audit_form"):
-    business_name = st.text_input("Business Name", placeholder="e.g., Joe's Plumbing")
-    url = st.text_input("Website URL", placeholder="https://example.com")
-    submitted = st.form_submit_button("Run Audit")
+st.markdown("---")
 
-if submitted and url:
-    with st.spinner("Analyzing website..."):
-        soup, error = fetch_website_content(url)
-        
-        if error:
-            st.error(f"Failed to fetch website: {error}")
-        else:
-            text = extract_text(soup)
-            schema_result = check_schema_markup(soup)
-            
-            entities = ["plumber", "roofer", "electrician", "contractor", "24/7", "emergency", "licensed", "insured"]
-            entity_coverage = check_entity_coverage(text, entities)
-            
-            score = calculate_visibility_score(schema_result, entity_coverage, len(text))
-            recommendations = generate_recommendations(schema_result, entity_coverage)
-            
-            st.success("Audit complete!")
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.metric("AI Visibility Score", f"{score}/100")
-            with col2:
-                st.metric("Schema Detected", "Yes" if schema_result["found"] else "No")
-            
-            st.subheader("📋 Key Findings")
-            for entity, found in entity_coverage.items():
-                st.write(f"{entity}: {'✅' if found else '❌'}")
-            
-            st.subheader("💡 Recommendations")
-            for rec in recommendations:
-                st.write(f"• {rec}")
-            
-            pdf_file = generate_pdf(business_name, url, score, recommendations)
-            with open(pdf_file, "rb") as f:
-                st.download_button("📥 Download PDF Report", f, file_name=f"{business_name}_audit.pdf")
+col1, col2 = st.columns(2)
+
+with col1:
+    with st.container(border=True):
+        st.subheader("🔍 Audit Tool")
+        st.markdown("Check if your website is visible to AI search.")
+        if st.button("Run an Audit →", key="audit_btn", use_container_width=True):
+            st.switch_page("pages/01_Audit.py")
+
+with col2:
+    with st.container(border=True):
+        st.subheader("🛠️ Schema Fixer")
+        st.markdown("Generate proper schema markup for your business.")
+        if st.button("Fix Your Site →", key="schema_btn", use_container_width=True):
+            st.switch_page("pages/02_Schema_Fixer.py")
+
+st.markdown("---")
+
+# Dashboard link
+col3, col4, col5 = st.columns([1, 2, 1])
+with col4:
+    if st.button("📊 View Your Dashboard", use_container_width=True):
+        st.switch_page("pages/03_Dashboard.py")
+
+st.markdown("---")
+st.caption("© 2026 AgentAir. Built for local businesses.")
