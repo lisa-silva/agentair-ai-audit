@@ -59,26 +59,23 @@ display_df = df[['date', 'business_name', 'url', 'score']].copy()
 display_df.columns = ['Date', 'Business', 'Website', 'Score']
 
 # Add view button for each row
-for idx, row in display_df.iterrows():
-    with col1:
+    for idx, row in display_df.iterrows():
     with st.container(border=True):
-        st.subheader("🔍 Audit Tool")
-        st.markdown("Check if your website is visible to AI search.")
-        if st.button("Run an Audit →", key="audit_btn", use_container_width=True):
-            st.switch_page("pages/01_Audit.py")
-
-with col2:
-    with st.container(border=True):
-        st.subheader("🛠️ Schema Fixer")
-        st.markdown("Generate proper schema markup for your business.")
-        if st.button("Fix Your Site →", key="schema_btn", use_container_width=True):
-            st.switch_page("pages/02_Schema_Fixer.py")
-
-# Dashboard link
-col3, col4, col5 = st.columns([1, 2, 1])
-with col4:
-    if st.button("📊 View Your Dashboard", use_container_width=True):
-        st.switch_page("pages/03_Dashboard.py")
+        col1, col2, col3, col4, col5 = st.columns([2, 2, 3, 1, 1])
+        
+        with col1:
+            st.write(row['Date'])
+        with col2:
+            st.write(row['Business'])
+        with col3:
+            st.write(row['Website'])
+        with col4:
+            score_color = "🟢" if row['Score'] >= 70 else "🟡" if row['Score'] >= 40 else "🔴"
+            st.write(f"{score_color} {row['Score']}")
+        with col5:
+            if st.button("View", key=f"view_{idx}"):
+                st.session_state.selected_audit_id = audits[idx]['id']
+                st.switch_page("pages/04_Audit_Detail.py")
 
 # Export option
 st.markdown("---")
