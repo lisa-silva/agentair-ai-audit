@@ -19,7 +19,7 @@ with col1:
         st.subheader("🔍 Audit Tool")
         st.markdown("Check if your website is visible to AI search.")
         if st.button("Run an Audit →", key="audit_btn", use_container_width=True):
-            st.switch_page("pages/01_Audit.py")
+            st.switch_page("pages/01_Audit")
 
 with col2:
     with st.container(border=True):
