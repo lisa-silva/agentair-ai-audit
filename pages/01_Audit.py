@@ -47,7 +47,8 @@ if submitted and url:
             for rec in recommendations:
                 st.write(f"• {rec}")
             # Save the audit
-            save_audit(business_name, url, score, recommendations)    
+            save_audit(business_name, url, score, recommendations)  
+            st.success("✅ Audit saved to dashboard!")  
             pdf_file = generate_pdf(business_name, url, score, recommendations)
             with open(pdf_file, "rb") as f:
                 st.download_button("📥 Download PDF Report", f, file_name=f"{business_name}_audit.pdf")
