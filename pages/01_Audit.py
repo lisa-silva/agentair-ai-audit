@@ -31,7 +31,7 @@ if submitted and url:
             # ═══════════════════════════════════════════════════════════════
             try:
                 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-                model = genai.GenerativeModel("gemini-2.0-flash")
+                model = genai.GenerativeModel("gemini-2.5-flash-lite")
                 
                 prompt = f"""
                 You are an expert SEO analyst. The user is auditing a business named "{business_name}".
