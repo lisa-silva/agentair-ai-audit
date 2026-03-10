@@ -47,6 +47,7 @@ if submitted and url:
                     entities = ["services", "about us", "contact", "pricing", "reviews", "team", "location", "guarantee"]
                     
             except Exception as e:
+                st.error(f"🚨 AI Engine Error: {e}")
                 entities = ["services", "about us", "contact", "pricing", "reviews", "team", "location", "guarantee"]
             # ═══════════════════════════════════════════════════════════════
             entity_coverage = check_entity_coverage(text, entities)
