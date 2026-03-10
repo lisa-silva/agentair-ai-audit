@@ -1,3 +1,4 @@
+import google.generativeai as genai
 from utils.storage import save_audit
 import streamlit as st
 from utils.scraper import fetch_website_content, extract_text
@@ -25,7 +26,29 @@ if submitted and url:
             text = extract_text(soup)
             schema_result = check_schema_markup(soup)
             
-            entities = ["plumber", "roofer", "electrician", "contractor", "24/7", "emergency", "licensed", "insured"]
+            # ═══════════════════════════════════════════════════════════════
+            # DYNAMIC AI KEYWORD ENGINE
+            # ═══════════════════════════════════════════════════════════════
+            try:
+                genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+                model = genai.GenerativeModel("gemini-2.0-flash")
+                
+                prompt = f"""
+                You are an expert SEO analyst. The user is auditing a business named "{business_name}".
+                Identify their likely industry. 
+                Generate a list of exactly 8 highly relevant keywords, core services, or trust signals that MUST be on their website for AI to understand them.
+                Return ONLY a comma-separated list of words. No intro, no bullet points, no extra text.
+                """
+                response = model.generate_content(prompt)
+                
+                entities = [word.strip().lower() for word in response.text.split(',')]
+                
+                if len(entities) < 4:
+                    entities = ["services", "about us", "contact", "pricing", "reviews", "team", "location", "guarantee"]
+                    
+            except Exception as e:
+                entities = ["services", "about us", "contact", "pricing", "reviews", "team", "location", "guarantee"]
+            # ═══════════════════════════════════════════════════════════════
             entity_coverage = check_entity_coverage(text, entities)
             
             score = calculate_visibility_score(schema_result, entity_coverage, len(text))
